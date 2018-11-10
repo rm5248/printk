@@ -13,7 +13,9 @@ To use in a kernel:
 1. Implement strlen
 2. change the methods 'print' and 'printchar' to output data
  to an appropriate place.
-3. implement the va_args and family macros.
+3. implement the va_args and family macros.(note: if using GCC,
+you can still probably include `<stddef.h>` depending on your
+compiler settings)
 
 Still to implement:
 - floating point values
