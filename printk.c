@@ -63,7 +63,7 @@ static void reverse_notnull( char* string, int len ){
     len -= 1;
 
     /* Walk through the array backwards, putting the characters in the front */
-    for( len; len > 0; len-- ){
+    for( ; len > 0; len-- ){
         if( string[ len ] == '\0' ) continue;
 
         if( len < location ) break;
@@ -81,7 +81,6 @@ static void format_integer( char* location, int len, int number, int base, int c
     const char* characters = "0123456789abcdefghijklmnopqrstuvwxyz";
     int char_idx;
     int negative = number < 0;
-    char toadd;
 
     if( negative ) number *= -1;
 
@@ -122,7 +121,7 @@ static void format_integer( char* location, int len, int number, int base, int c
     }
 
     /* Null out the remainter characters in the array */
-    for( x; x < len; x++ ){
+    for( ; x < len; x++ ){
         location[ x ] = '\0';
     }
 
@@ -212,7 +211,6 @@ static int parse_specifier( const char* format, int start, int len, struct Speci
     char* location = (char*)format + start + 1;
     const char* end = format + len;
     int chars_consumed;
-    char format_buffer[ FORMAT_BUFFER_SIZE ];
     int total_consumed = 0;
 
     if( *location == '%' ){
@@ -286,8 +284,13 @@ int printk( const char* format, ... ){
     va_start(args,format);
     while( format[ current_location ] != '\0' ){
         if( format[ current_location ] == '%' ){
-            current_location += parse_specifier( format, current_location, len, &specifier );
+            specifier.width = 0;
+            specifier.precision = 0;
+            specifier.flags = FLAGS_NONE;
+            specifier.type = '\0';
             base = 0;
+
+            current_location += parse_specifier( format, current_location, len, &specifier );
 
             switch( specifier.type ){
             case '%': 
@@ -318,7 +321,7 @@ int printk( const char* format, ... ){
                 format_integer( format_buffer, FORMAT_BUFFER_SIZE, va_arg(args,int), base, uppercase, &specifier );
                 toprint = format_buffer;
             }
-            print_string( format_buffer, specifier.width, specifier.flags == FLAGS_LEFT_JUSTIFY );
+            print_string( toprint, specifier.width, specifier.flags == FLAGS_LEFT_JUSTIFY );
         }else{
             printchar( format[ current_location ] );
         }
@@ -354,5 +357,8 @@ int main( int argc, char** argv ){
     printf( "\n" );
 
     printk( "number in field 8 chars wide with leading 0(decimal: 787234): \"%08x\"", 787234 );
+    printf( "\n" );
+
+    printk( "print string %s", "test value" );
     printf( "\n" );
 }
