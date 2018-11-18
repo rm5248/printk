@@ -84,6 +84,10 @@ static void format_integer( char* location, int len, int number, int base, int c
 
     if( negative ) number *= -1;
 
+    if( number == 0 ){
+        location[ x++ ] = characters[ 0 ];
+    }
+
     /* Put the numbers in the array backwards */
     while( number > 0 ){
         char_idx = number % base;
@@ -335,6 +339,8 @@ int printk( const char* format, ... ){
 }
 
 int main( int argc, char** argv ){
+    int x;
+
     printk( "ten is: %d", 10 );
     printf( "\n" );
 
@@ -361,4 +367,9 @@ int main( int argc, char** argv ){
 
     printk( "print string %s", "test value" );
     printf( "\n" );
+
+    for( x = 0; x < 20; x++ ){
+        printk( "x is %d 0x%x", x, x );
+        printf( "\n" );
+    }
 }
